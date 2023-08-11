@@ -1,0 +1,28 @@
+[user]
+	name = isaac
+	email = minimaleffort769@gmail.com
+[init]
+	defaultBranch = main
+[alias]
+	aa = add --all
+	b = branch
+	bD = branch -D
+	co = checkout
+	can = commit --amend --no-edit
+	cmsg = commit -m
+	fa = fetch --all
+	lo = log --oneline --decorate --format=format:'%C(yellow)%h%Creset %s %Cblue%cr%Creset %Cgreen%an%Cred%d%Creset'
+	lgo = log --oneline --graph --decorate --format=format:'%C(yellow)%h%Creset %s %Cblue%cr%Creset %Cgreen%an%Cred%d%Creset'
+	p = push
+	pf = push -f
+	pu = push -u
+	s = status
+	ss = status -s
+[core]
+	editor = nvim
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
