@@ -167,6 +167,7 @@ require("lazy").setup({
           s = {
             name = "Search",
             f = { "<cmd>Telescope find_files<cr>", "File browser" },
+            F = { "<cmd>Telescope find_files hidden=true<cr>", "File browser" },
             g = { "<cmd>Telescope live_grep<cr>", "Text" },
             s = { "<cmd>Telescope lsp_document_symbols<cr>", "Document symbols" },
             S = { "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", "Workspace symbols" },
@@ -202,8 +203,6 @@ require("lazy").setup({
         },
         highlight = { enable = true, }
       }
-
-      vim.cmd [[TSUpdate]]
     end
   },
   {
@@ -212,7 +211,6 @@ require("lazy").setup({
       "neovim/nvim-lspconfig",
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/nvim-cmp",
-      "neovim/nvim-lspconfig",
       "hrsh7th/cmp-nvim-lsp",
       "hrsh7th/cmp-buffer",
       "hrsh7th/cmp-path",
@@ -282,15 +280,16 @@ require("lazy").setup({
       }
 
       lspconfig.omnisharp.setup {
+        cmd = { "/home/tpht/.local/share/nvim/mason/packages/omnisharp/omnisharp" },
         capabilities = completion_capabilities,
-        enable_editorconfig_support = true,
-        enable_ms_build_load_projects_on_demand = false,
-        enable_roslyn_analyzers = true,
-        organize_imports_on_format = true,
-        enable_import_completion = true,
-        sdk_include_prereleases = true,
-        analyze_open_documents_only = false,
-        root_dir = lspconfig.util.root_pattern("*.sln")
+        root_dir = lspconfig.util.root_pattern("*.sln", "*.csproj", "function.json"),
+        filetypes = { "cs" },
+        settings = {
+          FormattingOptions = {
+            EnableEditorConfigSupport = true,
+            OrganizeImports = true
+          }
+        }
       }
 
       -- lspconfig.prisma.setup {
