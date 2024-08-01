@@ -251,7 +251,9 @@ require("lazy").setup({
       local completion_capabilities = require('cmp_nvim_lsp').default_capabilities()
 
       lspconfig.bashls.setup {
-        capabilities = completion_capabilities
+        capabilities = completion_capabilities,
+        filetypes = { "sh", "bash" },
+        single_file_support= true,
       }
 
       lspconfig.jsonls.setup {
@@ -287,7 +289,10 @@ require("lazy").setup({
         settings = {
           FormattingOptions = {
             EnableEditorConfigSupport = true,
-            OrganizeImports = true
+            OrganizeImports = true,
+            RoslynExtensionsOptions = {
+              EnableImportCompletion = true
+            }
           }
         }
       }
