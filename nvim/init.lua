@@ -42,7 +42,28 @@ require("lazy").setup({
       "kylechui/nvim-surround",
       tag = "v2.1.4",
       config = function()
-        require("nvim-surround").setup()
+        require("nvim-surround").setup({
+          mapping = {
+            add = 'ys',
+            delete = 'ds',
+            find = '',
+            find_left = '',
+            highlight = '',
+            replace = 'cs',
+            update_n_lines = '',
+
+            -- Add this only if you don't want to use extended mappings
+            suffix_last = '',
+            suffix_next = '',
+          },
+          search_method = 'cover_or_next'
+        })
+
+        -- Remap adding surrounding to Visual mode selection
+        vim.keymap.set('x', 'S', [[:<C-u>lua MiniSurround.add('visual')<CR>]], { silent = true })
+
+        -- Make special mapping for "add surrounding for line"
+        vim.keymap.set('n', 'yss', 'ys_', { remap = true })
       end
     },
     {
@@ -282,7 +303,7 @@ require("lazy").setup({
       }
 
       lspconfig.omnisharp.setup {
-        cmd = { "/home/tpht/.local/share/nvim/mason/packages/omnisharp/omnisharp" },
+        cmd = { "/home/isaac/.local/share/nvim/mason/packages/omnisharp/omnisharp" },
         capabilities = completion_capabilities,
         root_dir = lspconfig.util.root_pattern("*.sln", "*.csproj", "function.json"),
         filetypes = { "cs" },
