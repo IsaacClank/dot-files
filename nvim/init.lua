@@ -1,4 +1,7 @@
-vim.g.mapleader = " "    -- Set leader to <Space>. Should already be set by mini.nvim.basics.
+vim.g.mapleader = " " -- Set leader to <Space>. Should already be set by mini.nvim.basics.
+
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 vim.opt.expandtab = true -- In insert mode, expand tabs into spaces.
 vim.opt.scrolloff = 10   -- Minimum lines offset on top and bottom. Used to add padding.
@@ -28,22 +31,8 @@ require("lazy").setup({
       config = function()
         require('mini.basics').setup()
         require('mini.pairs').setup()
-      end,
-    },
-    {
-      "ggandor/leap.nvim",
-      branch = "main",
-      config = function()
-        vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)')
-        vim.keymap.set({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)')
-      end
-    },
-    {
-      "kylechui/nvim-surround",
-      tag = "v2.1.4",
-      config = function()
-        require("nvim-surround").setup({
-          mapping = {
+        require('mini.surround').setup({
+          mappings = {
             add = 'ys',
             delete = 'ds',
             find = '',
@@ -56,14 +45,16 @@ require("lazy").setup({
             suffix_last = '',
             suffix_next = '',
           },
-          search_method = 'cover_or_next'
+          search_method = 'cover_or_next',
         })
-
-        -- Remap adding surrounding to Visual mode selection
-        vim.keymap.set('x', 'S', [[:<C-u>lua MiniSurround.add('visual')<CR>]], { silent = true })
-
-        -- Make special mapping for "add surrounding for line"
-        vim.keymap.set('n', 'yss', 'ys_', { remap = true })
+      end,
+    },
+    {
+      "ggandor/leap.nvim",
+      branch = "main",
+      config = function()
+        vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)')
+        vim.keymap.set({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)')
       end
     },
     {
@@ -72,6 +63,24 @@ require("lazy").setup({
       enabled = function() return vim.g.vscode ~= 1 end,
       config = function()
         require("which-key").setup()
+      end
+    },
+    {
+      "nvim-tree/nvim-tree.lua",
+      tag = "v1.6.0",
+      config = function()
+        require("nvim-tree").setup {
+          view = {
+            width = "15%"
+          }
+        }
+
+        require("which-key").register(
+          {
+            e = { "<cmd>NvimTreeToggle<cr>", "Toggle explorer" }
+          },
+          { prefix = "<leader>" }
+        )
       end
     }
   },
@@ -201,28 +210,23 @@ require("lazy").setup({
   ------------------------ INTELLISENSE ------------------------
   {
     "nvim-treesitter/nvim-treesitter",
-    tag = 'v0.9.2',
+    -- tag = 'v0.9.2',
+    branch = 'master',
     enabled = function()
       return vim.g.vscode ~= 1;
     end,
     config = function()
       require("nvim-treesitter.configs").setup {
         auto_install = true,
-        ignore_install = {},
-        sync_install = false,
         ensure_installed = {
           "bash",
           "c_sharp",
-          "dockerfile",
           "json",
           "lua",
-          "markdown",
           "typescript",
-          "vim",
           "vimdoc",
           "yaml",
-        },
-        highlight = { enable = true, }
+        }
       }
     end
   },
@@ -274,7 +278,7 @@ require("lazy").setup({
       lspconfig.bashls.setup {
         capabilities = completion_capabilities,
         filetypes = { "sh", "bash" },
-        single_file_support= true,
+        single_file_support = true,
       }
 
       lspconfig.jsonls.setup {
@@ -308,12 +312,15 @@ require("lazy").setup({
         root_dir = lspconfig.util.root_pattern("*.sln", "*.csproj", "function.json"),
         filetypes = { "cs" },
         settings = {
+          msbuild = {
+            enabled = true
+          },
           FormattingOptions = {
             EnableEditorConfigSupport = true,
             OrganizeImports = true,
-            RoslynExtensionsOptions = {
-              EnableImportCompletion = true
-            }
+          },
+          RoslynExtensionsOptions = {
+            EnableImportCompletion = true
           }
         }
       }
