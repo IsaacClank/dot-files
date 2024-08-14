@@ -70,8 +70,9 @@ require("lazy").setup({
       tag = "v1.6.0",
       config = function()
         require("nvim-tree").setup {
+          sync_root_with_cwd = true,
           view = {
-            width = "15%"
+            width = "15%",
           }
         }
 
@@ -208,28 +209,6 @@ require("lazy").setup({
     end
   },
   ------------------------ INTELLISENSE ------------------------
-  {
-    "nvim-treesitter/nvim-treesitter",
-    -- tag = 'v0.9.2',
-    branch = 'master',
-    enabled = function()
-      return vim.g.vscode ~= 1;
-    end,
-    config = function()
-      require("nvim-treesitter.configs").setup {
-        auto_install = true,
-        ensure_installed = {
-          "bash",
-          "c_sharp",
-          "json",
-          "lua",
-          "typescript",
-          "vimdoc",
-          "yaml",
-        }
-      }
-    end
-  },
   {
     "williamboman/mason.nvim",
     dependencies = {
