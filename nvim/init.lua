@@ -342,6 +342,7 @@ require("lazy").setup({
             f = { function() vim.lsp.buf.format() end, "Format" },
             i = { function() vim.lsp.buf.implementation() end, "Implementation" },
             k = { function() vim.lsp.buf.hover() end, "Hover" },
+            K = { function() vim.diagnostic.open_float() end, "Hover diagnostic" },
             r = { "<cmd>Telescope lsp_references<cr>", "References" },
             n = { function() vim.lsp.buf.rename() end, "Rename" },
           },
