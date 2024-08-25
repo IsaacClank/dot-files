@@ -68,6 +68,7 @@ require("lazy").setup({
     {
       "nvim-tree/nvim-tree.lua",
       tag = "v1.6.0",
+      enabled = function() return vim.g.vscode ~= 1 end,
       config = function()
         require("nvim-tree").setup {
           sync_root_with_cwd = true,
@@ -209,6 +210,22 @@ require("lazy").setup({
     end
   },
   ------------------------ INTELLISENSE ------------------------
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ':TSUpdate',
+    config = function()
+      require('nvim-treesitter.configs').setup {
+        ensure_installed = {
+          "lua",
+          "c_sharp",
+          "vimdoc",
+        },
+        highlight = {
+          enable = true
+        }
+      }
+    end
+  },
   {
     "williamboman/mason.nvim",
     dependencies = {
