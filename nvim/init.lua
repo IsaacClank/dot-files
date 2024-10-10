@@ -1,3 +1,4 @@
+-- COMMON_OPTIONS
 vim.g.mapleader = " " -- Set leader to <Space>. Should already be set by mini.nvim.basics.
 
 vim.g.loaded_netrw = 1
@@ -7,8 +8,16 @@ vim.opt.expandtab = true -- In insert mode, expand tabs into spaces.
 vim.opt.scrolloff = 10   -- Minimum lines offset on top and bottom. Used to add padding.
 vim.opt.shiftwidth = 2   -- Number of spaces used for auto-indent.
 vim.opt.tabstop = 2      -- Number of spaces to render tabs in a file. This does **not** modify the file.
+-- COMMON_OPTIONS
 
--- Bootstrap Lazy.nvim
+-- FILE_ASSOCIATION
+vim.api.nvim_create_autocmd({"BufNewFile", "BufRead"}, {
+  pattern = "*compose.yml",
+  command = "set filetype=yaml.docker-compose"
+})
+-- FILE_ASSOCIATION
+
+-- PLUGINS
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
@@ -117,7 +126,7 @@ require("lazy").setup({
     },
     {
       "lewis6991/gitsigns.nvim",
-      tag = "v0.7",
+      tag = "v0.9.0",
       enabled = function()
         return vim.g.vscode ~= 1;
       end,
@@ -179,6 +188,21 @@ require("lazy").setup({
       "sindrets/diffview.nvim",
       branch = "main",
       enabled = function() return vim.g.vscode ~= 1 end,
+      config = function()
+        require('which-key').register(
+          {
+            g = {
+              d = {
+                name = "Diff View",
+                d = { "<cmd>DiffviewOpen<cr>", "All" },
+                f = { "<cmd>DiffviewFileHistory<cr>", "File" },
+                c = { "<cmd>DiffviewClose<cr>", "Close" }
+              }
+            }
+          },
+          { prefix = "<leader>" }
+        )
+      end
     }
   },
   ------------------------ NAVIGATION ------------------------
@@ -215,11 +239,11 @@ require("lazy").setup({
     build = ':TSUpdate',
     config = function()
       require('nvim-treesitter.configs').setup {
-        ensure_installed = {
-          "lua",
-          "c_sharp",
-          "vimdoc",
-        },
+        auto_install = true,
+        sync_install = false,
+        ensure_installed = { "vimdoc", },
+        ignore_install = {},
+        modules = {},
         highlight = {
           enable = true
         }
@@ -237,7 +261,8 @@ require("lazy").setup({
       "hrsh7th/cmp-path",
       "hrsh7th/cmp-cmdline",
       "hrsh7th/cmp-vsnip",
-      "hrsh7th/vim-vsnip"
+      "hrsh7th/vim-vsnip",
+      "mhartington/formatter.nvim",
     },
     build = ":MasonUpdate",
     enabled = function()
@@ -262,9 +287,10 @@ require("lazy").setup({
           ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
         }),
         sources = cmp.config.sources({
+          -- { name = 'nvim_lsp_signature_help' },
           { name = 'nvim_lsp' },
           { name = 'vsnip' },
-          { name = 'buffer' }
+          { name = 'buffer' },
         })
       })
 
@@ -277,29 +303,45 @@ require("lazy").setup({
         single_file_support = true,
       }
 
+      lspconfig.dockerls.setup {
+        capabilities = completion_capabilities,
+        filetypes= { "dockerfile" }
+      }
+
+      lspconfig.docker_compose_language_service.setup {
+        capabilities = completion_capabilities,
+        filetypes = {"yaml.docker-compose"},
+        single_file_support = true,
+        root_dir = lspconfig.util.root_pattern("docker-compose.yaml", "docker-compose.yml", "compose.yaml", "compose.yml")
+      }
+
       lspconfig.jsonls.setup {
         capabilities = completion_capabilities,
       }
 
       lspconfig.lua_ls.setup {
-        capabilities = completion_capabilities,
-        settings = {
-          Lua = {
+        on_init = function(client)
+          client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua, {
             runtime = {
-              version = 'LuaJIT',
+              version = 'LuaJIT'
             },
-            diagnostics = {
-              globals = { 'vim' },
-            },
+            -- Make the server aware of Neovim runtime files
             workspace = {
-              library = vim.api.nvim_get_runtime_file("", true),
               checkThirdParty = false,
-            },
-            telemetry = {
-              enable = false,
-            },
-          },
-        },
+              library = {
+                vim.env.VIMRUNTIME,
+                -- Depending on the usage, you might want to add additional paths here.
+                "${3rd}/luv/library"
+                -- "${3rd}/busted/library",
+              }
+              -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
+              -- library = vim.api.nvim_get_runtime_file("", true)
+            }
+          })
+        end,
+        settings = {
+          Lua = { }
+        }
       }
 
       lspconfig.omnisharp.setup {
@@ -321,12 +363,16 @@ require("lazy").setup({
         }
       }
 
-      -- lspconfig.prisma.setup {
-      --   capabilities = completion_capabilities,
-      -- }
-
-      lspconfig.tsserver.setup {
+      lspconfig.ts_ls.setup {
         capabilities = completion_capabilities,
+      }
+
+      require("formatter").setup {
+        filetype = {
+          typescript = {
+            require("formatter.filetypes.typescript").prettier
+          },
+        }
       }
 
       require("which-key").register(
@@ -335,7 +381,7 @@ require("lazy").setup({
             name = "Lsp",
             a = { function() vim.lsp.buf.code_action() end, "Code Action" },
             d = { function() vim.lsp.buf.definition() end, "Definition" },
-            f = { function() vim.lsp.buf.format() end, "Format" },
+            f = { "<cmd>Format<cr>", "Format" },
             i = { function() vim.lsp.buf.implementation() end, "Implementation" },
             k = { function() vim.lsp.buf.hover() end, "Hover" },
             K = { function() vim.diagnostic.open_float() end, "Hover diagnostic" },
@@ -348,3 +394,4 @@ require("lazy").setup({
     end,
   }
 })
+-- PLUGINS
