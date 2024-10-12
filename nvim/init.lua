@@ -36,8 +36,33 @@ require("lazy").setup({
   {
     "folke/which-key.nvim",
     tag = "v3.13.3",
+    event = "VeryLazy",
     enabled = vim.g.vscode ~= 1,
-    opts = {},
+    config = function()
+      local wk = require("which-key")
+
+      wk.setup({
+        icons = {
+          mappings = false
+        },
+        preset = "helix",
+      })
+
+      wk.add({
+        { "<leader>g",  group = "Git" },
+        { "<leader>gd", group = "Diff" },
+        { "<leader>gr", group = "Reset" },
+        { "<leader>gs", group = "Stage" },
+        { "<leader>gu", group = "Unstage" },
+        { "<leader>l",  group = "Intellisense" },
+        { "<leader>s",  group = "Navigation" },
+
+        { "<M-Up>",     "<cmd>resize +5<cr>",          desc = "Increase height" },
+        { "<M-Down>",   "<cmd>resize -5<cr>",          desc = "Decrease height" },
+        { "<M-Right>",  "<cmd>vertical resize +5<cr>", desc = "Increase width" },
+        { "<M-Left>",   "<cmd>vertical resize -5<cr>", desc = "Decrease width" },
+      })
+    end
   },
   { "echasnovski/mini.basics", branch = "main", opts = {} },
   { "echasnovski/mini.pairs",  branch = "main", opts = {} },
@@ -83,6 +108,50 @@ require("lazy").setup({
   -- PLUGIN__ESSENTIALS
 
   -- PLUGINS__THEME
+  {
+    "echasnovski/mini.indentscope",
+    branch = "main",
+    enabled = vim.g.vscode ~= 1,
+    config = function()
+      local indentscope = require("mini.indentscope")
+      indentscope.setup({
+        draw = {
+          animation = require("mini.indentscope").gen_animation.linear({ duration = 5 })
+        }
+      })
+    end
+  },
+  {
+    "nvim-lualine/lualine.nvim",
+    branch = "master",
+    enabled = vim.g.vscode ~= 1,
+    opts = {},
+    dependencies = {
+      "nvim-tree/nvim-web-devicons"
+    }
+  },
+  {
+    "folke/noice.nvim",
+    opts = {
+      lsp = {
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
+          ["cmp.entry.get_documentation"] = true,
+        },
+      },
+      presets = {
+        bottom_search = true,
+        command_palette = true,
+        long_message_to_split = true,
+        inc_rename = true,
+        lsp_doc_border = true,
+      },
+    },
+    dependencies = {
+      "MunifTanjim/nui.nvim"
+    }
+  },
   {
     "nvim-tree/nvim-web-devicons",
     branch = "master",
@@ -162,6 +231,7 @@ require("lazy").setup({
     config = function()
       require("nvim-treesitter.configs").setup {
         auto_install = true,
+        ensure_installed = { "vim", "regex", "lua", "bash", "markdown", "markdown_inline" },
         highlight = { enable = true },
         incremental_selection = { enable = true },
         textobjects = { enable = true },
@@ -178,7 +248,7 @@ require("lazy").setup({
       { "<leader>lK", function() vim.diagnostic.open_float() end,         desc = "Hover diagnostic", },
       { "<leader>ln", function() vim.lsp.buf.rename() end,                desc = "Rename", },
       { "<leader>lr", function() vim.lsp.buf.references() end,            desc = "References" },
-      { "<leader>ls", "<cmd>Telescope lsp_document_symbols<cr>",          desc = "Document symboles" },
+      { "<leader>ls", "<cmd>Telescope lsp_document_symbols<cr>",          desc = "Document symbols" },
       { "<leader>lS", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "Workspace symbols" },
     },
     enabled = vim.g.vscode ~= 1,
@@ -259,16 +329,18 @@ require("lazy").setup({
       {
         "hrsh7th/nvim-cmp",
         dependencies = {
-          "hrsh7th/cmp-nvim-lsp-signature-help",
+          -- "hrsh7th/cmp-nvim-lsp-signature-help",
           "hrsh7th/cmp-nvim-lsp",
           "hrsh7th/cmp-buffer",
           "hrsh7th/cmp-path",
           "hrsh7th/cmp-cmdline",
           "hrsh7th/cmp-vsnip",
-          "hrsh7th/vim-vsnip"
+          "hrsh7th/vim-vsnip",
+          "lukas-reineke/cmp-under-comparator",
         },
         config = function()
           local cmp = require("cmp")
+
           cmp.setup({
             snippet = {
               expand = function(args)
@@ -284,10 +356,22 @@ require("lazy").setup({
             }),
             sources = cmp.config.sources({
               { name = "vsnip" },
-              { name = "nvim_lsp_signature_help" },
+              -- { name = "nvim_lsp_signature_help" },
               { name = "nvim_lsp" },
               { { name = "buffer" } },
             }),
+            sorting = {
+              comparators = {
+                cmp.config.compare.offset,
+                cmp.config.compare.exact,
+                cmp.config.compare.score,
+                require "cmp-under-comparator".under,
+                cmp.config.compare.kind,
+                cmp.config.compare.sort_text,
+                cmp.config.compare.length,
+                cmp.config.compare.order,
+              }
+            }
           })
         end
       },
