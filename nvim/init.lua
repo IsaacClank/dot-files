@@ -252,7 +252,7 @@ require("lazy").setup({
       { "<leader>lk", function() vim.lsp.buf.hover() end,                 desc = "Hover", },
       { "<leader>lK", function() vim.diagnostic.open_float() end,         desc = "Hover diagnostic", },
       { "<leader>ln", function() vim.lsp.buf.rename() end,                desc = "Rename", },
-      { "<leader>lr", function() vim.lsp.buf.references() end,            desc = "References" },
+      { "<leader>lr", "<cmd>Telescope lsp_references<cr>",                desc = "References" },
       { "<leader>ls", "<cmd>Telescope lsp_document_symbols<cr>",          desc = "Document symbols" },
       { "<leader>lS", "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>", desc = "Workspace symbols" },
     },
