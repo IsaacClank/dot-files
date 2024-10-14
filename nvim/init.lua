@@ -387,9 +387,9 @@ require("lazy").setup({
         },
         opts = {
           formatters_by_ft = {
-            lua = { lsp_format = "first" },
             typescript = { "prettier" },
             prisma = { "prisma" },
+            ["_"] = { lsp_format = "fallback" },
           },
           formatters = {
             prisma = {
